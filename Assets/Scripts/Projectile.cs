@@ -10,24 +10,41 @@ public class Projectile : MonoBehaviour
     private Vector2 _moveDirection;
     private RaycastHit2D _hit;
     private RaycastHit2D _oldHit;
+
     private void Start()
     {   
         _moveDirection = new Vector2(transform.up[0], transform.up[1]);
-        _hit = Physics2D.Raycast(transform.position, _moveDirection, 100, 8);
-
     }
 
     private void FixedUpdate()
     {
-        Debug.Log(_moveDirection);
-        transform.position += _speed * Time.fixedDeltaTime * new Vector3(_moveDirection[0], _moveDirection[1]);
+        CalculateNextPos();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void CalculateNextPos()
     {
-        transform.position = _hit.point + _hit.normal * 0.16f;
-        _moveDirection = Vector3.Reflect(_moveDirection, collision.contacts[0].normal);
-        _hit = Physics2D.Raycast(transform.position, _moveDirection, 100, 8);
+        float dist = _speed * Time.fixedDeltaTime;
+        _hit = Physics2D.Raycast(transform.position, _moveDirection, dist, 8);
+        if(_hit.normal == new Vector2(0, 0))
+        {
+            transform.position += _speed * Time.fixedDeltaTime * new Vector3(_moveDirection[0], _moveDirection[1]);
+        }
+        else
+        {
+            _oldHit.point = transform.position;
+            while (_hit.normal != new Vector2(0, 0))
+            {
+                _moveDirection = Vector3.Reflect(_moveDirection, _hit.normal);
+                dist -= Vector3.Distance(_hit.point, _oldHit.point);
+                _oldHit = _hit;
+                Collider2D colide = _hit.collider;
+                colide.enabled = false;
+                _hit = Physics2D.Raycast(_hit.point, _moveDirection, dist, 8);
+                colide.enabled = true;
+            }
+            transform.position = _oldHit.point + _moveDirection.normalized * dist;
+        }
+
     }
 
 
