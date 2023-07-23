@@ -10,7 +10,7 @@
     - Схема расположения коллидеров (Walls, Obstacles);
     - Префабы Projectile;
 * Префаб Projectile и файл скрипта;
-* Пример с видео директории `./Bouncing-projectile/Example/Video.MP4`
+* Пример с видео в директории `./Bouncing-projectile/Example/Video.MP4`
 
 ## Требования
 
